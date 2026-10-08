@@ -3,6 +3,8 @@
 import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+const SITE_URL = "https://pcgh-taskforge.vercel.app";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -13,7 +15,7 @@ export default function LoginPage() {
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined },
+      options: { emailRedirectTo: `${SITE_URL}/auth/callback` },
     });
     setMessage(error ? error.message : "Check your email for the secure sign-in link.");
   }
