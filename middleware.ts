@@ -22,20 +22,9 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   if (path.startsWith("/auth/callback")) return response;
+  if (!user) return NextResponse.redirect(new URL("/login", request.url));
 
-  if (!user) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  const { data: appUser } = await supabase
-    .from("users")
-    .select("id,role_id,roles(name)")
-    .eq("auth_user_id", user.id)
-    .maybeSingle();
-
-  const role = Array.isArray(appUser?.roles)
-    ? appUser?.roles[0]?.name
-    : (appUser?.roles as { name?: string } | null)?.name;
+  const { data: role } = await supabase.rpc("current_app_role");
 
   if (path.startsWith("/admin") && role !== "ADMIN") {
     return NextResponse.redirect(new URL("/worker", request.url));
