@@ -17,7 +17,32 @@ export async function middleware(request: NextRequest) {
       },
     },
   );
-  await supabase.auth.getUser();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  const path = request.nextUrl.pathname;
+
+  if (!user) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  const { data: appUser } = await supabase
+    .from("users")
+    .select("id,role_id,roles(name)")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+
+  const role = Array.isArray(appUser?.roles)
+    ? appUser?.roles[0]?.name
+    : (appUser?.roles as { name?: string } | null)?.name;
+
+  if (path.startsWith("/admin") && role !== "ADMIN") {
+    return NextResponse.redirect(new URL("/worker", request.url));
+  }
+
+  if (path.startsWith("/worker") && role !== "WORKER") {
+    return NextResponse.redirect(new URL("/admin", request.url));
+  }
+
   return response;
 }
 
