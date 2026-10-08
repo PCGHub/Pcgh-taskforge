@@ -16,7 +16,7 @@ export default async function User360({params}:{params:Promise<{id:string}>}){
  return <main className="shell"><header className="topbar"><div><span className="eyebrow">USER 360</span><h1>{p?.display_name||u.email}</h1><p>{u.email} · {u.status}</p></div><Link href="/admin/users" className="button">Workers</Link></header>
  <section className="grid stats"><article><span>Wallet balance</span><strong>₦{balance.toLocaleString()}</strong></article><article><span>Total assignments</span><strong>{a.length}</strong></article><article><span>Rewarded</span><strong>{a.filter(x=>x.status==="REWARDED").length}</strong></article><article><span>Withdrawals</span><strong>{withdrawals?.length||0}</strong></article></section>
  <section className="grid"><article className="card"><h2>Profile</h2><p>{p?.first_name||""} {p?.last_name||""}</p><p>Country: {p?.country_code||"—"} · Timezone: {p?.timezone||"—"}</p><p>Joined: {new Date(u.created_at).toLocaleString()}</p></article>
- <article className="card"><h2>Task history</h2>{a.map(x=><p key={x.id}><strong>{x.tasks?.task_code}</strong> · {x.tasks?.title} · {x.status}</p>)}</article>
+ <article className="card"><h2>Task history</h2>{a.map(x=>{const task=x.tasks?.[0]; return <p key={x.id}><strong>{task?.task_code}</strong> · {task?.title} · {x.status}</p>})}</article>
  <article className="card"><h2>Withdrawals</h2>{withdrawals?.map((x:any)=><p key={x.id}>{x.withdrawal_code} · ₦{Number(x.amount).toLocaleString()} · {x.status}</p>)}</article>
  <article className="card"><h2>Ledger</h2>{posted.map(x=><p key={x.id}>{x.direction} ₦{Number(x.amount).toLocaleString()} · {x.transaction_type}</p>)}</article></section></main>;
 }
